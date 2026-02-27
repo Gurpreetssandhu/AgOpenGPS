@@ -52,6 +52,11 @@ In order to contribute to AgOpenGPS, follow these steps:
 3. Make your changes and commit to this branch
 4. Create a PR targeting the `develop` branch
 
+## Automation Identity
+
+The automation account used by Copilot tasks is `copilot-swe-agent[bot]` (`198982749+Copilot@users.noreply.github.com`).
+It is safe to grant this identity access when needed, but follow least-privilege and grant only the minimum required permissions.
+
 ## Translation
 
 We use [Weblate](https://weblate.org) to manage translations for this project.
