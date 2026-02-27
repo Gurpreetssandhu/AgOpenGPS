@@ -57,6 +57,7 @@ In order to contribute to AgOpenGPS, follow these steps:
 The automation account used by Copilot tasks is `copilot-swe-agent[bot]` (`198982749+Copilot@users.noreply.github.com`).
 It is generally safe to grant this identity access when needed, but use least-privilege and grant only the minimum required permissions.
 To reduce code/data exposure risk, avoid admin-level permissions, avoid sharing unrelated secrets, and remove access when the task is complete.
+After access is granted with the appropriate scope, Copilot can continue creating repository/project issues within those granted permissions.
 
 ## Translation
 
