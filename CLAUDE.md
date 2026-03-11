@@ -91,11 +91,24 @@ dotnet publish SourceCode/AgOpenGPS.sln
 - **.NET Analyzers** are enabled; code style is enforced in build
 - **Release builds** treat warnings as errors (`TreatWarningsAsErrors`)
 
-### Observed patterns
+### Dual naming convention (legacy vs modern)
+
+- **Legacy (`GPS/Classes/`):** `C` prefix on domain classes with public fields
+  - e.g., `CABLine`, `CBoundary`, `CFlag` with `public double latitude = 0;`
+- **Modern (`AgOpenGPS.Core/Models/`):** Standard PascalCase with properties
+  - e.g., `Field`, `Boundary`, `GeoCoord` with `public double Northing { get; }`
+- When modifying existing code, **match the convention of the file you're editing**
+
+### Other observed patterns
 
 - WinForms classes prefixed with `Form` (e.g., `FormGPS`, `FormDialog`)
-- Fields often lack explicit prefix convention — follow existing patterns in each file
-- Domain-specific `*.Designer.cs` files (ConfigData, NMEA, PGN, etc.) are **not** auto-generated — `generated_code = false` is set so analyzers run on them
+- `FormGPS` uses **heavy partial class splitting** — logic is spread across multiple `*.Designer.cs` files (Controls, GUI, OpenGL, PGN, Position, Sections, UDPComm) which are **not** auto-generated designer files (`generated_code = false` in .editorconfig)
+- Value types use structs: `GeoCoord`, `GeoDir`, `GeoDelta`, `ColorRgba`, `Wgs84`
+- Presenters use interface-based DI: `IApplicationPresenter`, `IPanelPresenter`, `IErrorPresenter`
+- Serialization via Streamer classes: `FieldStreamer`, `BoundaryStreamer`, `ContourStreamer`
+- Settings stored in Windows Registry (`SOFTWARE\AgOpenGPS`) and XML
+- Static utility classes: `Log` (logging), `RegistrySettings`
+- Single-instance enforcement via mutex in `Program.cs`
 - Translations managed via Weblate — do not manually edit translation resource files
 
 ## Git Workflow
@@ -151,12 +164,14 @@ Uses **GitVersion 5.12.x** for automatic semantic versioning from git history.
 ## Architecture Notes
 
 - **AgOpenGPS** and **AgIO** are the two main executables — either can launch the other
-- Communication with hardware uses **UDP** and **serial ports** (NMEA protocol)
+- Communication with hardware uses **UDP** (loopback sockets for local IPC) and **serial ports**
+- Protocols: **NMEA 0183** (GPS), **ISOBUS/J1939** (CAN bus via PGN messages), **HTTP/REST** (AgShare cloud)
 - Graphics rendering uses **OpenGL** via OpenTK wrapper in `AgOpenGPS.Core/DrawLib/`
 - The project maintains both **WinForms** (legacy, full-featured) and **WPF** (modern) UIs
-- `AgOpenGPS.Core` contains shared business logic used by both UI implementations
+- `AgOpenGPS.Core` contains shared business logic used by both UI implementations (MVP/MVVM hybrid pattern)
 - `AgLibrary` provides cross-cutting utilities (logging, settings, controls)
 - `ModSim` enables development/testing without physical GPS hardware
+- Coordinate systems: **WGS84** (lat/lon for GPS) converted to **local plane** (northing/easting for field operations)
 
 ## Domain Concepts
 
